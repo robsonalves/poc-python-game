@@ -23,7 +23,8 @@ FPS = 60
 # Configurações do Jogador
 PLAYER_WIDTH, PLAYER_HEIGHT = 50, 50
 PLAYER_VEL = 5
-PLAYER_JUMP = 10
+PLAYER_JUMP = 15  # Aumentar a força do pulo
+GRAVITY = 1  # Gravidade ajustada
 
 # Configurações das Plataformas
 PLATFORM_WIDTH, PLATFORM_HEIGHT = 100, 20
@@ -47,19 +48,17 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= PLAYER_VEL
         if keys[pygame.K_RIGHT]:
             self.rect.x += PLAYER_VEL
-        if keys[pygame.K_SPACE] and self.jump_count < 2:  # Permitir até dois pulos
-            self.vel_y = -PLAYER_JUMP
-            self.jump_count += 1
-        
-        self.vel_y += 1  # Gravidade
+        if keys[pygame.K_SPACE]:
+            self.jump()
+
+        self.vel_y += GRAVITY  # Gravidade
         self.rect.y += self.vel_y
 
         # Checar colisão com plataformas
         collisions = pygame.sprite.spritecollide(self, platforms, False)
-        if collisions:
-            self.vel_y = 0
-            self.jumping = False
+        if collisions and self.vel_y > 0:
             self.rect.bottom = collisions[0].rect.top
+            self.vel_y = 0
             self.jump_count = 0  # Resetar contador de pulos ao tocar no chão
 
         # Prevenir que o jogador saia da tela
@@ -71,6 +70,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+
+    def jump(self):
+        if self.jump_count < 2:  # Permitir até dois pulos
+            self.vel_y = -PLAYER_JUMP
+            self.jump_count += 1
 
 # Classe da Plataforma
 class Platform(pygame.sprite.Sprite):
