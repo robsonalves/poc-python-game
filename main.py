@@ -68,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         collisions = pygame.sprite.spritecollide(self, platforms, False)
         if collisions:
             for platform in collisions:
-                if self.vel_y > 0:  # Apenas corrigir a posição se o jogador estiver caindo
+                if self.vel_y > 0 and self.rect.bottom <= platform.rect.bottom:  # Apenas corrigir a posição se o jogador estiver caindo e a colisão estiver em cima
                     self.rect.bottom = platform.rect.top
                     self.vel_y = 0
                     self.jump_count = 0  # Resetar contador de pulos ao tocar no chão
