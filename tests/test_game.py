@@ -30,6 +30,7 @@ class TestGame(unittest.TestCase):
         collected_items_count = 0
         for item in list(self.items):  # Usar uma lista para evitar modificação durante a iteração
             self.player.rect.topleft = item.rect.topleft  # Simular coleta do item
+            self.all_sprites.update(self.platforms)  # Atualizar todas as sprites
             collected_items = pygame.sprite.spritecollide(self.player, self.items, True)
             for collected_item in collected_items:
                 collected_items_count += 1
@@ -45,18 +46,21 @@ class TestGame(unittest.TestCase):
 
     def test_collect_all_items_by_moving_player(self):
         initial_score = self.score
+        collected_items_count = 0
         for item in self.items:
             self.player.rect.topleft = item.rect.topleft  # Mover o jogador para o item
             self.all_sprites.update(self.platforms)  # Atualizar todas as sprites
             collected_items = pygame.sprite.spritecollide(self.player, self.items, True)
             for collected_item in collected_items:
+                collected_items_count += 1
                 if collected_item.item_type == 'star':
                     self.score += 10
                     print(f"Collected a star at ({collected_item.rect.x}, {collected_item.rect.y}), +10 points")
                 elif collected_item.item_type == 'coconut':
                     self.score += 5
                     print(f"Collected a coconut at ({collected_item.rect.x}, {collected_item.rect.y}), +5 points")
-        print(f"Final score after collecting all items by moving player: {self.score}")
+        print(f"Collected {collected_items_count} items, final score: {self.score}")
+        self.assertEqual(collected_items_count, 5)  # Verificar se todos os 5 itens foram coletados
         self.assertEqual(self.score, initial_score + 50)
 
     def test_reset_game(self):
