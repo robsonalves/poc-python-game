@@ -16,6 +16,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 BROWN = (139, 69, 19)
+BLUE = (0, 0, 255)
 
 # FPS
 FPS = 60
@@ -130,30 +131,53 @@ def create_item_near_platform(platforms):
     item_type = random.choice(['star', 'coconut'])
     return Item(x, y, item_type)
 
-def main():
-    clock = pygame.time.Clock()
-    run = True
+def draw_button(win, text, x, y, width, height, color):
+    pygame.draw.rect(win, color, (x, y, width, height))
+    font = pygame.font.Font(None, 36)
+    text_surf = font.render(text, True, WHITE)
+    text_rect = text_surf.get_rect(center=(x + width // 2, y + height // 2))
+    win.blit(text_surf, text_rect)
 
+def reset_game():
+    platforms = create_platforms(NUM_PLATFORMS)
+    ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
+    platforms.add(ground)
+    items = create_items(platforms)
+    return platforms, items, 0
+
+def setup_game():
     player = Player()
     all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
 
-    platforms = create_platforms(NUM_PLATFORMS)
-    ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
-    platforms.add(ground)
+    platforms, items, score = reset_game()
     all_sprites.add(platforms)
-    all_sprites.add(ground)
-
-    items = create_items(platforms)
     all_sprites.add(items)
 
-    score = 0
+    return player, all_sprites, platforms, items, score
+
+def main():
+    clock = pygame.time.Clock()
+    run = True
+
+    player, all_sprites, platforms, items, score = setup_game()
+
+    button_x, button_y, button_width, button_height = 650, 10, 140, 50  # Posição e tamanho do botão
 
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
+                    # Reiniciar o jogo
+                    for platform in platforms:
+                        platform.kill()
+                    for item in items:
+                        item.kill()
+                    player, all_sprites, platforms, items, score = setup_game()
 
         all_sprites.update(platforms)
 
@@ -169,20 +193,18 @@ def main():
 
         # Verificar se todos os itens foram coletados
         if not items:
-            # Reiniciar plataformas e itens
             for platform in platforms:
-                if platform != ground:
-                    platform.kill()
-            platforms = create_platforms(NUM_PLATFORMS)
-            platforms.add(ground)  # Adicionar o chão novamente
+                platform.kill()
+            platforms, items, _ = reset_game()
             all_sprites.add(platforms)
-
-            items = create_items(platforms)
             all_sprites.add(items)
 
         WIN.fill(WHITE)
         all_sprites.draw(WIN)
         
+        # Desenhar botão de reiniciar
+        draw_button(WIN, 'Restart', button_x, button_y, button_width, button_height, BLUE)
+
         # Exibir pontuação
         font = pygame.font.Font(None, 36)
         text = font.render(f'Score: {score}', True, BLACK)
