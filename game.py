@@ -119,18 +119,23 @@ class Item(pygame.sprite.Sprite):
 
 def create_items(platforms):
     items = pygame.sprite.Group()
-    # Garantir que haja 3 estrelas e 2 cocos
+    item_positions = set()  # Manter as posições ocupadas para evitar sobreposição
     item_types = ['star', 'star', 'star', 'coconut', 'coconut']
     for item_type in item_types:
-        item = create_item_near_platform(platforms, item_type)
+        item = create_item_near_platform(platforms, item_type, item_positions)
         items.add(item)
     return items
 
-def create_item_near_platform(platforms, item_type):
-    platform = random.choice(platforms.sprites())
-    x = random.randint(platform.rect.left, platform.rect.right)
-    y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
-    return Item(x, y, item_type)
+def create_item_near_platform(platforms, item_type, item_positions):
+    while True:
+        platform = random.choice(platforms.sprites())
+        x = random.randint(platform.rect.left, platform.rect.right)
+        y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
+        if (x, y) not in item_positions:
+            item_positions.add((x, y))
+            item = Item(x, y, item_type)
+            print(f"Created item: {item_type} at ({x}, {y})")
+            return item
 
 def draw_button(win, text, x, y, width, height, color):
     pygame.draw.rect(win, color, (x, y, width, height))
