@@ -66,10 +66,12 @@ class Player(pygame.sprite.Sprite):
 
         # Checar colisão com plataformas
         collisions = pygame.sprite.spritecollide(self, platforms, False)
-        if collisions and self.vel_y > 0:
-            self.rect.bottom = collisions[0].rect.top
-            self.vel_y = 0
-            self.jump_count = 0  # Resetar contador de pulos ao tocar no chão
+        if collisions:
+            for platform in collisions:
+                if self.vel_y > 0:  # Apenas corrigir a posição se o jogador estiver caindo
+                    self.rect.bottom = platform.rect.top
+                    self.vel_y = 0
+                    self.jump_count = 0  # Resetar contador de pulos ao tocar no chão
 
         # Prevenir que o jogador saia da tela
         if self.rect.left < 0:
@@ -137,10 +139,9 @@ def main():
     all_sprites.add(player)
 
     platforms = create_platforms(NUM_PLATFORMS)
-    all_sprites.add(platforms)
-
     ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
     platforms.add(ground)
+    all_sprites.add(platforms)
     all_sprites.add(ground)
 
     items = create_items(platforms)
@@ -173,6 +174,7 @@ def main():
                 if platform != ground:
                     platform.kill()
             platforms = create_platforms(NUM_PLATFORMS)
+            platforms.add(ground)  # Adicionar o chão novamente
             all_sprites.add(platforms)
 
             items = create_items(platforms)
