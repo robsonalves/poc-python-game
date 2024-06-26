@@ -30,12 +30,21 @@ GRAVITY = 1  # Gravidade ajustada
 PLATFORM_WIDTH, PLATFORM_HEIGHT = 100, 20
 NUM_PLATFORMS = 10  # Número de plataformas aumentadas
 
+# Carregar sons
+jump_sound = pygame.mixer.Sound("assets/sounds/jump.wav")
+collect_sound = pygame.mixer.Sound("assets/sounds/collect.wav")
+
+# Carregar sprites (exemplo, você precisa substituir pelos seus próprios sprites)
+player_sprite = pygame.image.load("assets/images/player.png")
+star_sprite = pygame.image.load("assets/images/star.png")
+coconut_sprite = pygame.image.load("assets/images/coconut.png")
+platform_sprite = pygame.image.load("assets/images/platform.png")
+
 # Classe do Jogador
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT))
-        self.image.fill(GREEN)
+        self.image = pygame.transform.scale(player_sprite, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH // 2, HEIGHT // 2)
         self.vel_y = 0
@@ -75,13 +84,13 @@ class Player(pygame.sprite.Sprite):
         if self.jump_count < 2:  # Permitir até dois pulos
             self.vel_y = -PLAYER_JUMP
             self.jump_count += 1
+            jump_sound.play()
 
 # Classe da Plataforma
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill(RED)
+        self.image = pygame.transform.scale(platform_sprite, (width, height))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
@@ -90,11 +99,10 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, x, y, item_type):
         super().__init__()
         self.item_type = item_type
-        self.image = pygame.Surface((30, 30))
         if item_type == 'star':
-            self.image.fill(YELLOW)
+            self.image = pygame.transform.scale(star_sprite, (30, 30))
         elif item_type == 'coconut':
-            self.image.fill(BROWN)
+            self.image = pygame.transform.scale(coconut_sprite, (30, 30))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
@@ -122,7 +130,7 @@ def main():
 
     # Criação de itens colecionáveis
     for _ in range(5):
-        item = Item(random.randint(0, WIDTH), random.randint(0, HEIGHT - 150), random.choice(['star', 'coconut']))
+        item = create_item_near_platform(platforms)
         all_sprites.add(item)
         items.add(item)
 
@@ -143,12 +151,13 @@ def main():
                 score += 10
             elif item.item_type == 'coconut':
                 score += 5
+            collect_sound.play()
 
         # Verificar se todos os itens foram coletados
         if not items:
             # Reiniciar fase ou passar para a próxima
             for _ in range(5):
-                item = Item(random.randint(0, WIDTH), random.randint(0, HEIGHT - 150), random.choice(['star', 'coconut']))
+                item = create_item_near_platform(platforms)
                 all_sprites.add(item)
                 items.add(item)
 
@@ -163,6 +172,13 @@ def main():
         pygame.display.update()
 
     pygame.quit()
+
+def create_item_near_platform(platforms):
+    platform = random.choice(platforms.sprites())
+    x = random.randint(platform.rect.left, platform.rect.right)
+    y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
+    item_type = random.choice(['star', 'coconut'])
+    return Item(x, y, item_type)
 
 if __name__ == "__main__":
     main()
