@@ -119,16 +119,17 @@ class Item(pygame.sprite.Sprite):
 
 def create_items(platforms):
     items = pygame.sprite.Group()
-    for _ in range(5):
-        item = create_item_near_platform(platforms)
+    # Garantir que haja 3 estrelas e 2 cocos
+    item_types = ['star', 'star', 'star', 'coconut', 'coconut']
+    for item_type in item_types:
+        item = create_item_near_platform(platforms, item_type)
         items.add(item)
     return items
 
-def create_item_near_platform(platforms):
+def create_item_near_platform(platforms, item_type):
     platform = random.choice(platforms.sprites())
     x = random.randint(platform.rect.left, platform.rect.right)
     y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
-    item_type = random.choice(['star', 'coconut'])
     return Item(x, y, item_type)
 
 def draw_button(win, text, x, y, width, height, color):

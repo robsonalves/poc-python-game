@@ -5,7 +5,7 @@ https://freesound.org/
 
 # Run this App
 
-`python main.py`
+`python game.py`
 
 
 
