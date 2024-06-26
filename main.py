@@ -32,7 +32,8 @@ NUM_PLATFORMS = 10  # Número de plataformas aumentadas
 
 # Carregar sons
 jump_sound = pygame.mixer.Sound("assets/sounds/jump.wav")
-collect_sound = pygame.mixer.Sound("assets/sounds/collect.wav")
+collect_star_sound = pygame.mixer.Sound("assets/sounds/coin.wav")
+collect_coconut_sound = pygame.mixer.Sound("assets/sounds/pickup.wav")
 
 # Carregar sprites (exemplo, você precisa substituir pelos seus próprios sprites)
 player_sprite = pygame.image.load("assets/images/player.png")
@@ -149,9 +150,10 @@ def main():
         for item in collected_items:
             if item.item_type == 'star':
                 score += 10
+                collect_star_sound.play()
             elif item.item_type == 'coconut':
                 score += 5
-            collect_sound.play()
+                collect_coconut_sound.play()
 
         # Verificar se todos os itens foram coletados
         if not items:
