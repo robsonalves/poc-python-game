@@ -95,6 +95,13 @@ class Platform(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
+def create_platforms(num_platforms):
+    platforms = pygame.sprite.Group()
+    for _ in range(num_platforms):
+        platform = Platform(random.randint(0, WIDTH - PLATFORM_WIDTH), random.randint(HEIGHT // 2, HEIGHT - PLATFORM_HEIGHT), PLATFORM_WIDTH, PLATFORM_HEIGHT)
+        platforms.add(platform)
+    return platforms
+
 # Classe dos Itens Colecionáveis
 class Item(pygame.sprite.Sprite):
     def __init__(self, x, y, item_type):
@@ -107,33 +114,37 @@ class Item(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
+def create_items(platforms):
+    items = pygame.sprite.Group()
+    for _ in range(5):
+        item = create_item_near_platform(platforms)
+        items.add(item)
+    return items
+
+def create_item_near_platform(platforms):
+    platform = random.choice(platforms.sprites())
+    x = random.randint(platform.rect.left, platform.rect.right)
+    y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
+    item_type = random.choice(['star', 'coconut'])
+    return Item(x, y, item_type)
+
 def main():
     clock = pygame.time.Clock()
     run = True
 
     player = Player()
     all_sprites = pygame.sprite.Group()
-    platforms = pygame.sprite.Group()
-    items = pygame.sprite.Group()
-
     all_sprites.add(player)
 
-    # Criação de plataformas básicas
-    for _ in range(NUM_PLATFORMS):
-        platform = Platform(random.randint(0, WIDTH - PLATFORM_WIDTH), random.randint(HEIGHT // 2, HEIGHT - PLATFORM_HEIGHT), PLATFORM_WIDTH, PLATFORM_HEIGHT)
-        all_sprites.add(platform)
-        platforms.add(platform)
+    platforms = create_platforms(NUM_PLATFORMS)
+    all_sprites.add(platforms)
 
-    # Criação da plataforma no chão
     ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
-    all_sprites.add(ground)
     platforms.add(ground)
+    all_sprites.add(ground)
 
-    # Criação de itens colecionáveis
-    for _ in range(5):
-        item = create_item_near_platform(platforms)
-        all_sprites.add(item)
-        items.add(item)
+    items = create_items(platforms)
+    all_sprites.add(items)
 
     score = 0
 
@@ -157,11 +168,15 @@ def main():
 
         # Verificar se todos os itens foram coletados
         if not items:
-            # Reiniciar fase ou passar para a próxima
-            for _ in range(5):
-                item = create_item_near_platform(platforms)
-                all_sprites.add(item)
-                items.add(item)
+            # Reiniciar plataformas e itens
+            for platform in platforms:
+                if platform != ground:
+                    platform.kill()
+            platforms = create_platforms(NUM_PLATFORMS)
+            all_sprites.add(platforms)
+
+            items = create_items(platforms)
+            all_sprites.add(items)
 
         WIN.fill(WHITE)
         all_sprites.draw(WIN)
@@ -174,13 +189,6 @@ def main():
         pygame.display.update()
 
     pygame.quit()
-
-def create_item_near_platform(platforms):
-    platform = random.choice(platforms.sprites())
-    x = random.randint(platform.rect.left, platform.rect.right)
-    y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
-    item_type = random.choice(['star', 'coconut'])
-    return Item(x, y, item_type)
 
 if __name__ == "__main__":
     main()

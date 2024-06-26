@@ -21,3 +21,5 @@ https://freesound.org/
 [] Menu to select character
 [] Think some actions for character not just jump everywhere
 [] Some other challenges in the field, like not collectable that if touched finish the game or drain life (if this way, is necessary to define Life System and collectables to increase refill it)
+[] Create a button on the screen to reset phase and clean points
+[] BUG: After some new phases my character stopped to jump
