@@ -1,10 +1,11 @@
 import pygame
-from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, jump_sound, collect_star_sound, collect_coconut_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
+from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, jump_sound, collect_star_sound, collect_coconut_sound, enemy_hit_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
 from player import Player
 from game_platform import Platform
 from item import Item
 from enemy import Enemy
 from utils import create_platforms, create_items, draw_button, create_enemies
+import time
 
 def reset_game(level):
     platforms = create_platforms(NUM_PLATFORMS + level)  # Aumentar o número de plataformas com o nível
@@ -57,7 +58,12 @@ def main():
 
         # Checar colisão com inimigos
         if pygame.sprite.spritecollideany(player, enemies):
-            # Reiniciar a fase atual se o jogador colidir com um inimigo
+            enemy_hit_sound.play()
+            font = pygame.font.Font(None, 72)
+            text = font.render("Ouchhh, you have been bitten", True, BLACK)
+            WIN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+            pygame.display.update()
+            pygame.time.wait(2000)  # Esperar 2 segundos antes de reiniciar a fase
             player, platforms, items, enemies, score = setup_game(level)
 
         # Verificar se todos os itens foram coletados

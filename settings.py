@@ -38,3 +38,4 @@ platform_sprite = pygame.image.load("assets/images/platform.png")
 jump_sound = pygame.mixer.Sound("assets/sounds/jump.wav")
 collect_star_sound = pygame.mixer.Sound("assets/sounds/coin.wav")
 collect_coconut_sound = pygame.mixer.Sound("assets/sounds/pickup.wav")
+enemy_hit_sound = pygame.mixer.Sound("assets/sounds/enemy_hit.wav")  # Novo som para colisão com inimigos
