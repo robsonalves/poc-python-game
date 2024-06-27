@@ -90,6 +90,9 @@ class Player(pygame.sprite.Sprite):
             self.jump_count += 1
             jump_sound.play()
 
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
 # Classe da Plataforma
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -153,20 +156,15 @@ def reset_game():
 
 def setup_game():
     player = Player()
-    all_sprites = pygame.sprite.Group()
-    all_sprites.add(player)
-
     platforms, items, score = reset_game()
-    all_sprites.add(platforms)
-    all_sprites.add(items)
 
-    return player, all_sprites, platforms, items, score
+    return player, platforms, items, score
 
 def main():
     clock = pygame.time.Clock()
     run = True
 
-    player, all_sprites, platforms, items, score = setup_game()
+    player, platforms, items, score = setup_game()
 
     button_x, button_y, button_width, button_height = 650, 10, 140, 50  # Posição e tamanho do botão
 
@@ -179,13 +177,11 @@ def main():
                 mouse_x, mouse_y = event.pos
                 if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
                     # Reiniciar o jogo
-                    for platform in platforms:
-                        platform.kill()
-                    for item in items:
-                        item.kill()
-                    player, all_sprites, platforms, items, score = setup_game()
+                    player, platforms, items, score = setup_game()
 
-        all_sprites.update(platforms)
+        player.update(platforms)
+        platforms.update()
+        items.update()
 
         # Checar colisão com itens
         collected_items = pygame.sprite.spritecollide(player, items, True)
@@ -199,14 +195,12 @@ def main():
 
         # Verificar se todos os itens foram coletados
         if not items:
-            for platform in platforms:
-                platform.kill()
             platforms, items, _ = reset_game()
-            all_sprites.add(platforms)
-            all_sprites.add(items)
 
         WIN.fill(WHITE)
-        all_sprites.draw(WIN)
+        platforms.draw(WIN)
+        items.draw(WIN)
+        player.draw(WIN)
         
         # Desenhar botão de reiniciar
         draw_button(WIN, 'Restart', button_x, button_y, button_width, button_height, BLUE)
