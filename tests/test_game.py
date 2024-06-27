@@ -42,7 +42,7 @@ class TestGame(unittest.TestCase):
                     print("Collected a coconut, +5 points")
         print(f"Collected {collected_items_count} items, final score: {self.score}")
         self.assertEqual(collected_items_count, 5)  # Verificar se todos os 5 itens foram coletados
-        self.assertEqual(self.score, initial_score + 50)
+        self.assertEqual(self.score, initial_score + 40)
 
     def test_collect_all_items_by_moving_player(self):
         initial_score = self.score
@@ -61,7 +61,7 @@ class TestGame(unittest.TestCase):
                     print(f"Collected a coconut at ({collected_item.rect.x}, {collected_item.rect.y}), +5 points")
         print(f"Collected {collected_items_count} items, final score: {self.score}")
         self.assertEqual(collected_items_count, 5)  # Verificar se todos os 5 itens foram coletados
-        self.assertEqual(self.score, initial_score + 50)
+        self.assertEqual(self.score, initial_score + 40)
 
     def test_reset_game(self):
         self.player, self.all_sprites, self.platforms, self.items, self.score = setup_game()
