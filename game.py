@@ -57,8 +57,8 @@ def main():
 
         # Checar colisão com inimigos
         if pygame.sprite.spritecollideany(player, enemies):
-            print("Game Over")
-            run = False  # Finalizar o jogo se o jogador colidir com um inimigo
+            # Reiniciar a fase atual se o jogador colidir com um inimigo
+            player, platforms, items, enemies, score = setup_game(level)
 
         # Verificar se todos os itens foram coletados
         if not items:

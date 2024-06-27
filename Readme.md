@@ -27,4 +27,4 @@ https://freesound.org/
 [x] Feature: Make that the character sprite stay in the front of plataform sprite when character is passing throught platform object
 [x] Feature: Automate Tests to validate the game and phases to found bugs
 [x] Feature: Separe logic of the game in different files
-[] Bug: When I touch some enemy, not close/finish the game, just restart the phase
+[x] Bug: When I touch some enemy, not close/finish the game, just restart the phase
