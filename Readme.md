@@ -17,7 +17,7 @@ https://freesound.org/
 [x] At a new phase, replace the platform challenges randomly
 [] Online multi players aspects
 [] Ranking
-[] Start to thinking about the leveling turning more difficult the game
+[x] Start to thinking about the leveling turning more difficult the game
 [] Menu to select character
 [] Think some actions for character not just jump everywhere
 [] Some other challenges in the field, like not collectable that if touched finish the game or drain life (if this way, is necessary to define Life System and collectables to increase refill it)
@@ -27,3 +27,4 @@ https://freesound.org/
 [x] Feature: Make that the character sprite stay in the front of plataform sprite when character is passing throught platform object
 [x] Feature: Automate Tests to validate the game and phases to found bugs
 [x] Feature: Separe logic of the game in different files
+[] Bug: When I touch some enemy, not close/finish the game, just restart the phase

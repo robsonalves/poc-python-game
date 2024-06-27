@@ -1,28 +1,30 @@
 import pygame
-from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, jump_sound, collect_star_sound, collect_coconut_sound, NUM_PLATFORMS, PLATFORM_HEIGHT,BLACK
+from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, jump_sound, collect_star_sound, collect_coconut_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
 from player import Player
 from game_platform import Platform
 from item import Item
-from utils import create_platforms, create_items, draw_button
+from enemy import Enemy
+from utils import create_platforms, create_items, draw_button, create_enemies
 
 def reset_game(level):
     platforms = create_platforms(NUM_PLATFORMS + level)  # Aumentar o número de plataformas com o nível
     ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
     platforms.add(ground)
     items = create_items(platforms, level)  # Passar o nível para criar itens
-    return platforms, items, 0
+    enemies = create_enemies(level)  # Criar inimigos com base no nível
+    return platforms, items, enemies, 0
 
 def setup_game(level):
     player = Player(level)  # Passar o nível para ajustar a velocidade do jogador
-    platforms, items, score = reset_game(level)
-    return player, platforms, items, score
+    platforms, items, enemies, score = reset_game(level)
+    return player, platforms, items, enemies, score
 
 def main():
     clock = pygame.time.Clock()
     run = True
     level = 1
 
-    player, platforms, items, score = setup_game(level)
+    player, platforms, items, enemies, score = setup_game(level)
 
     button_x, button_y, button_width, button_height = 650, 10, 140, 50  # Posição e tamanho do botão
 
@@ -36,11 +38,12 @@ def main():
                 if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
                     # Reiniciar o jogo
                     level = 1
-                    player, platforms, items, score = setup_game(level)
+                    player, platforms, items, enemies, score = setup_game(level)
 
         player.update(platforms)
         platforms.update()
         items.update()
+        enemies.update()
 
         # Checar colisão com itens
         collected_items = pygame.sprite.spritecollide(player, items, True)
@@ -52,14 +55,20 @@ def main():
                 score += 5
                 collect_coconut_sound.play()
 
+        # Checar colisão com inimigos
+        if pygame.sprite.spritecollideany(player, enemies):
+            print("Game Over")
+            run = False  # Finalizar o jogo se o jogador colidir com um inimigo
+
         # Verificar se todos os itens foram coletados
         if not items:
             level += 1  # Aumentar o nível
-            player, platforms, items, _ = setup_game(level)
+            player, platforms, items, enemies, _ = setup_game(level)
 
         WIN.fill(WHITE)
         platforms.draw(WIN)
         items.draw(WIN)
+        enemies.draw(WIN)
         player.draw(WIN)
         
         # Desenhar botão de reiniciar

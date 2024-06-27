@@ -3,6 +3,7 @@ import pygame
 from settings import PLATFORM_WIDTH, PLATFORM_HEIGHT, WIDTH, HEIGHT, WHITE
 from game_platform import Platform
 from item import Item
+from enemy import Enemy
 
 def create_platforms(num_platforms):
     platforms = pygame.sprite.Group()
@@ -30,6 +31,15 @@ def create_item_near_platform(platforms, item_type, item_positions):
             item = Item(x, y, item_type)
             print(f"Created item: {item_type} at ({x}, {y})")
             return item
+
+def create_enemies(level):
+    enemies = pygame.sprite.Group()
+    for _ in range(level):  # Aumentar o número de inimigos com o nível
+        x = random.randint(0, WIDTH)
+        y = random.randint(0, HEIGHT // 2)
+        enemy = Enemy(x, y)
+        enemies.add(enemy)
+    return enemies
 
 def draw_button(win, text, x, y, width, height, color):
     pygame.draw.rect(win, color, (x, y, width, height))
