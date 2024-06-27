@@ -1,9 +1,8 @@
 import pygame
-from settings import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_VEL, PLAYER_JUMP, GRAVITY, WIDTH, HEIGHT
-from settings import jump_sound
+from settings import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_JUMP, WIDTH, HEIGHT, jump_sound
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, level):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load("assets/images/player.png"), (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect()
@@ -11,17 +10,20 @@ class Player(pygame.sprite.Sprite):
         self.vel_y = 0
         self.jumping = False
         self.jump_count = 0  # Contador de pulos
+        self.level = level
+        self.player_vel = 5 + level  # Aumentar a velocidade do jogador com o nível
+        self.gravity = 1 + level * 0.1  # Aumentar a gravidade com o nível
 
     def update(self, platforms):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.rect.x -= PLAYER_VEL
+            self.rect.x -= self.player_vel
         if keys[pygame.K_RIGHT]:
-            self.rect.x += PLAYER_VEL
+            self.rect.x += self.player_vel
         if keys[pygame.K_SPACE]:
             self.jump()
 
-        self.vel_y += GRAVITY  # Gravidade
+        self.vel_y += self.gravity  # Gravidade
         self.rect.y += self.vel_y
 
         # Checar colisão com plataformas

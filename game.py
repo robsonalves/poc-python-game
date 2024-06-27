@@ -1,28 +1,28 @@
 import pygame
-from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, jump_sound, collect_star_sound, collect_coconut_sound, NUM_PLATFORMS, PLATFORM_HEIGHT, BLACK
+from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, jump_sound, collect_star_sound, collect_coconut_sound, NUM_PLATFORMS, PLATFORM_HEIGHT,BLACK
 from player import Player
 from game_platform import Platform
 from item import Item
 from utils import create_platforms, create_items, draw_button
 
-def reset_game():
-    platforms = create_platforms(NUM_PLATFORMS)
+def reset_game(level):
+    platforms = create_platforms(NUM_PLATFORMS + level)  # Aumentar o número de plataformas com o nível
     ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
     platforms.add(ground)
-    items = create_items(platforms)
+    items = create_items(platforms, level)  # Passar o nível para criar itens
     return platforms, items, 0
 
-def setup_game():
-    player = Player()
-    platforms, items, score = reset_game()
-
+def setup_game(level):
+    player = Player(level)  # Passar o nível para ajustar a velocidade do jogador
+    platforms, items, score = reset_game(level)
     return player, platforms, items, score
 
 def main():
     clock = pygame.time.Clock()
     run = True
+    level = 1
 
-    player, platforms, items, score = setup_game()
+    player, platforms, items, score = setup_game(level)
 
     button_x, button_y, button_width, button_height = 650, 10, 140, 50  # Posição e tamanho do botão
 
@@ -35,7 +35,8 @@ def main():
                 mouse_x, mouse_y = event.pos
                 if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
                     # Reiniciar o jogo
-                    player, platforms, items, score = setup_game()
+                    level = 1
+                    player, platforms, items, score = setup_game(level)
 
         player.update(platforms)
         platforms.update()
@@ -53,7 +54,8 @@ def main():
 
         # Verificar se todos os itens foram coletados
         if not items:
-            platforms, items, _ = reset_game()
+            level += 1  # Aumentar o nível
+            player, platforms, items, _ = setup_game(level)
 
         WIN.fill(WHITE)
         platforms.draw(WIN)
@@ -63,9 +65,9 @@ def main():
         # Desenhar botão de reiniciar
         draw_button(WIN, 'Restart', button_x, button_y, button_width, button_height, BLUE)
 
-        # Exibir pontuação
+        # Exibir pontuação e nível
         font = pygame.font.Font(None, 36)
-        text = font.render(f'Score: {score}', True, BLACK)
+        text = font.render(f'Score: {score}  Level: {level}', True, BLACK)
         WIN.blit(text, (10, 10))
         
         pygame.display.update()

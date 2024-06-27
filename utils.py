@@ -11,10 +11,10 @@ def create_platforms(num_platforms):
         platforms.add(platform)
     return platforms
 
-def create_items(platforms):
+def create_items(platforms, level):
     items = pygame.sprite.Group()
     item_positions = set()  # Manter as posições ocupadas para evitar sobreposição
-    item_types = ['star', 'star', 'star', 'coconut', 'coconut']
+    item_types = ['star'] * (3 + level) + ['coconut'] * (2 + level)  # Aumentar o número de itens com o nível
     for item_type in item_types:
         item = create_item_near_platform(platforms, item_type, item_positions)
         items.add(item)
