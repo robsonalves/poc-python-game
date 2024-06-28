@@ -1,10 +1,10 @@
 import random
 import pygame
-from settings import PLATFORM_WIDTH, PLATFORM_HEIGHT, WIDTH, HEIGHT, WHITE
+import os
 from game_platform import Platform
 from item import Item
 from enemy import Enemy
-from obstacle import Obstacle
+from settings import PLATFORM_WIDTH, PLATFORM_HEIGHT, WIDTH, HEIGHT, WHITE, BLACK
 
 def create_platforms(num_platforms):
     platforms = pygame.sprite.Group()
@@ -42,19 +42,31 @@ def create_enemies(level):
         enemies.add(enemy)
     return enemies
 
-def create_obstacles(platforms, items):
-    obstacles = pygame.sprite.Group()
-    for item in items:
-        if random.random() < 0.5:  # 50% chance de criar um obstáculo perto de um item
-            x = item.rect.x + random.choice([-50, 50])
-            y = item.rect.y
-            obstacle = Obstacle(x, y, 'drain')
-            obstacles.add(obstacle)
-    return obstacles
-
 def draw_button(win, text, x, y, width, height, color):
     pygame.draw.rect(win, color, (x, y, width, height))
     font = pygame.font.Font(None, 36)
     text_surf = font.render(text, True, WHITE)
     text_rect = text_surf.get_rect(center=(x + width // 2, y + height // 2))
     win.blit(text_surf, text_rect)
+
+def save_score(name, score):
+    with open("highscores.txt", "a") as file:
+        file.write(f"{name},{score}\n")
+
+def load_highscores():
+    if not os.path.exists("highscores.txt"):
+        return []
+
+    with open("highscores.txt", "r") as file:
+        scores = [line.strip().split(",") for line in file]
+        scores = [(name, int(score)) for name, score in scores]
+        scores.sort(key=lambda x: x[1], reverse=True)  # Ordenar por pontuação, maior primeiro
+        return scores
+
+def display_highscores(win, scores):
+    font = pygame.font.Font(None, 36)
+    y_offset = 100
+    for idx, (name, score) in enumerate(scores[:5], start=1):  # Mostrar top 5
+        text = font.render(f"{idx}. {name} - {score}", True, BLACK)
+        win.blit(text, (WIDTH // 2 - text.get_width() // 2, y_offset))
+        y_offset += 40
