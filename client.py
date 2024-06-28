@@ -1,12 +1,13 @@
 import pygame
 import socket
 import threading
-from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, PLAYER_WIDTH, PLAYER_HEIGHT, jump_sound, collect_star_sound, collect_coconut_sound, enemy_hit_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
+from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, RED, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_LIFE, jump_sound, collect_star_sound, collect_coconut_sound, enemy_hit_sound, obstacle_hit_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
 from player import Player
 from game_platform import Platform
 from item import Item
 from enemy import Enemy
-from utils import create_platforms, create_items, draw_button, create_enemies
+from obstacle import Obstacle
+from utils import create_platforms, create_items, draw_button, create_enemies, create_obstacles
 
 # Configurações do cliente
 SERVER_IP = '127.0.0.1'
@@ -52,19 +53,21 @@ def reset_game(level):
     platforms.add(ground)
     items = create_items(platforms, level)
     enemies = create_enemies(level)
-    return platforms, items, enemies, 0
+    obstacles = create_obstacles(platforms, items)  # Criar obstáculos próximos aos itens coletáveis
+    return platforms, items, enemies, obstacles, 0
 
 def setup_game(level):
     player = Player(level)
-    platforms, items, enemies, score = reset_game(level)
-    return player, platforms, items, enemies, score
+    platforms, items, enemies, obstacles, score = reset_game(level)
+    player.life = PLAYER_LIFE  # Reiniciar vida do jogador
+    return player, platforms, items, enemies, obstacles, score
 
 def main():
     global level
     clock = pygame.time.Clock()
     run = True
 
-    player, platforms, items, enemies, score = setup_game(level)
+    player, platforms, items, enemies, obstacles, score = setup_game(level)
 
     button_x, button_y, button_width, button_height = 650, 10, 140, 50
 
@@ -77,12 +80,13 @@ def main():
                 mouse_x, mouse_y = event.pos
                 if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
                     level = 1
-                    player, platforms, items, enemies, score = setup_game(level)
+                    player, platforms, items, enemies, obstacles, score = setup_game(level)
 
         player.update(platforms)
         platforms.update()
         items.update()
         enemies.update()
+        obstacles.update()
 
         # Enviar posição do jogador para o servidor
         send_data(f"{player.rect.x},{player.rect.y}")
@@ -105,17 +109,33 @@ def main():
             WIN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
             pygame.display.update()
             pygame.time.wait(2000)
-            player, platforms, items, enemies, score = setup_game(level)
+            player, platforms, items, enemies, obstacles, score = setup_game(level)
+
+        # Checar colisão com obstáculos
+        collided_obstacle = pygame.sprite.spritecollideany(player, obstacles)
+        if collided_obstacle:
+            obstacle_hit_sound.play()
+            if collided_obstacle.obstacle_type == 'spike':
+                font = pygame.font.Font(None, 72)
+                text = font.render("Game Over!", True, RED)
+                WIN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+                pygame.display.update()
+                pygame.time.wait(2000)
+                level = 1
+                player, platforms, items, enemies, obstacles, score = setup_game(level)
+            elif collided_obstacle.obstacle_type == 'drain':
+                player.life -= 1
 
         # Verificar se todos os itens foram coletados
         if not items:
             level += 1
-            player, platforms, items, enemies, _ = setup_game(level)
+            player, platforms, items, enemies, obstacles, _ = setup_game(level)
 
         WIN.fill(WHITE)
         platforms.draw(WIN)
         items.draw(WIN)
         enemies.draw(WIN)
+        obstacles.draw(WIN)
         player.draw(WIN)
 
         # Desenhar outros jogadores
@@ -125,9 +145,9 @@ def main():
         # Desenhar botão de reiniciar
         draw_button(WIN, 'Restart', button_x, button_y, button_width, button_height, BLUE)
 
-        # Exibir pontuação e nível
+        # Exibir pontuação, nível e vida do jogador
         font = pygame.font.Font(None, 36)
-        text = font.render(f'Score: {score}  Level: {level}', True, BLACK)
+        text = font.render(f'Score: {score}  Level: {level}  Life: {player.life}', True, BLACK)
         WIN.blit(text, (10, 10))
 
         pygame.display.update()

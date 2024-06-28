@@ -4,6 +4,7 @@ from settings import PLATFORM_WIDTH, PLATFORM_HEIGHT, WIDTH, HEIGHT, WHITE
 from game_platform import Platform
 from item import Item
 from enemy import Enemy
+from obstacle import Obstacle
 
 def create_platforms(num_platforms):
     platforms = pygame.sprite.Group()
@@ -14,8 +15,8 @@ def create_platforms(num_platforms):
 
 def create_items(platforms, level):
     items = pygame.sprite.Group()
-    item_positions = set()  # Manter as posições ocupadas para evitar sobreposição
-    item_types = ['star'] * (3 + level) + ['coconut'] * (2 + level)  # Aumentar o número de itens com o nível
+    item_positions = set()
+    item_types = ['star'] * (3 + level) + ['coconut'] * (2 + level)
     for item_type in item_types:
         item = create_item_near_platform(platforms, item_type, item_positions)
         items.add(item)
@@ -25,7 +26,7 @@ def create_item_near_platform(platforms, item_type, item_positions):
     while True:
         platform = random.choice(platforms.sprites())
         x = random.randint(platform.rect.left, platform.rect.right)
-        y = platform.rect.top - 30  # Posicionar o item logo acima da plataforma
+        y = platform.rect.top - 30
         if (x, y) not in item_positions:
             item_positions.add((x, y))
             item = Item(x, y, item_type)
@@ -34,12 +35,22 @@ def create_item_near_platform(platforms, item_type, item_positions):
 
 def create_enemies(level):
     enemies = pygame.sprite.Group()
-    for _ in range(level):  # Aumentar o número de inimigos com o nível
+    for _ in range(level):
         x = random.randint(0, WIDTH)
         y = random.randint(0, HEIGHT // 2)
         enemy = Enemy(x, y)
         enemies.add(enemy)
     return enemies
+
+def create_obstacles(platforms, items):
+    obstacles = pygame.sprite.Group()
+    for item in items:
+        if random.random() < 0.5:  # 50% chance de criar um obstáculo perto de um item
+            x = item.rect.x + random.choice([-50, 50])
+            y = item.rect.y
+            obstacle = Obstacle(x, y, 'drain')
+            obstacles.add(obstacle)
+    return obstacles
 
 def draw_button(win, text, x, y, width, height, color):
     pygame.draw.rect(win, color, (x, y, width, height))
