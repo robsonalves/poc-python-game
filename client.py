@@ -138,11 +138,15 @@ def main():
     save_score(player_name, score)
 
     # Exibir o ranking
-    WIN.fill(WHITE)
-    highscores = load_highscores()
-    display_highscores(WIN, highscores)
-    pygame.display.update()
-    pygame.time.wait(5000)
+    run = True
+    while run:
+        WIN.fill(WHITE)
+        highscores = load_highscores()
+        display_highscores(WIN, highscores)
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
     pygame.quit()
     client.close()
