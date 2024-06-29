@@ -29,5 +29,5 @@ https://freesound.org/
 [x] Feature: Separe logic of the game in different files
 [x] Bug: When I touch some enemy, not close/finish the game, just restart the phase
 [] Bug: When the game start, make sure that the Enemy start position is from the border of the phase, to avoid that when I pass to a new phase, my character just born and dead
-[] Bug: When close the game and show the last score, the game is frozen to close
+[x] Bug: When close the game and show the last score, the game is frozen to close
 [] When the same name re-enter the game, just save the score if the last points is more high than other and not duplicate name on score
