@@ -36,8 +36,13 @@ def create_item_near_platform(platforms, item_type, item_positions):
 def create_enemies(level):
     enemies = pygame.sprite.Group()
     for _ in range(level):
-        x = random.randint(0, WIDTH)
-        y = random.randint(0, HEIGHT // 2)
+        # Escolher uma posição nas bordas da tela
+        if random.choice([True, False]):
+            x = random.choice([0, WIDTH])  # Borda esquerda ou direita
+            y = random.randint(0, HEIGHT)  # Qualquer posição verticalmente
+        else:
+            x = random.randint(0, WIDTH)  # Qualquer posição horizontalmente
+            y = random.choice([0, HEIGHT])  # Borda superior ou inferior
         enemy = Enemy(x, y)
         enemies.add(enemy)
     return enemies

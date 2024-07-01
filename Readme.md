@@ -30,4 +30,5 @@ https://freesound.org/
 [x] Bug: When I touch some enemy, not close/finish the game, just restart the phase
 [] Bug: When the game start, make sure that the Enemy start position is from the border of the phase, to avoid that when I pass to a new phase, my character just born and dead
 [x] Bug: When close the game and show the last score, the game is frozen to close
-[] When the same name re-enter the game, just save the score if the last points is more high than other and not duplicate name on score
+[x] When the same name re-enter the game, just save the score if the last points is more high than other and not duplicate name on score
+[] Bug: Not saving highscore when the last result is high the last one
