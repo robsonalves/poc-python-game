@@ -50,17 +50,28 @@ def draw_button(win, text, x, y, width, height, color):
     win.blit(text_surf, text_rect)
 
 def save_score(name, score):
-    with open("highscores.txt", "a") as file:
-        file.write(f"{name},{score}\n")
+    scores = load_highscores()
+    updated = False
+    for i, (n, s) in enumerate(scores):
+        if n == name:
+            if score > s:
+                scores[i] = (name, score)
+            updated = True
+            break
+    if not updated:
+        scores.append((name, score))
+    scores.sort(key=lambda x: x[1], reverse=True)
+    with open("highscores.txt", "w") as file:
+        for n, s in scores:
+            file.write(f"{n},{s}\n")
 
 def load_highscores():
     if not os.path.exists("highscores.txt"):
         return []
-
     with open("highscores.txt", "r") as file:
         scores = [line.strip().split(",") for line in file]
         scores = [(name, int(score)) for name, score in scores]
-        scores.sort(key=lambda x: x[1], reverse=True)  # Ordenar por pontuação, maior primeiro
+        scores.sort(key=lambda x: x[1], reverse=True)
         return scores
 
 def display_highscores(win, scores):
