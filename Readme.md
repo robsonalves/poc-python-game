@@ -16,7 +16,7 @@ https://freesound.org/
 [] Reduce Plataform quantities by the collectables items existance
 [x] At a new phase, replace the platform challenges randomly
 [Going] Online multi players aspects
-[] Ranking
+[x] Ranking
 [x] Start to thinking about the leveling turning more difficult the game
 [] Menu to select character
 [] Think some actions for character not just jump everywhere
@@ -28,7 +28,9 @@ https://freesound.org/
 [x] Feature: Automate Tests to validate the game and phases to found bugs
 [x] Feature: Separe logic of the game in different files
 [x] Bug: When I touch some enemy, not close/finish the game, just restart the phase
-[] Bug: When the game start, make sure that the Enemy start position is from the border of the phase, to avoid that when I pass to a new phase, my character just born and dead
+[x] Bug: When the game start, make sure that the Enemy start position is from the border of the phase, to avoid that when I pass to a new phase, my character just born and dead
 [x] Bug: When close the game and show the last score, the game is frozen to close
 [x] When the same name re-enter the game, just save the score if the last points is more high than other and not duplicate name on score
 [x] Bug: Not saving highscore when the last result is high the last one
+[x] Bug: When I start the game with two clients, for some reasone the second player is piiting all the screen in blue when it move the other player view
+[] Feature: In a multplayer enemeies behavior is necessary to be the same in both client

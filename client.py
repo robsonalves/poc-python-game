@@ -19,7 +19,10 @@ client.connect(ADDR)
 
 # Função para enviar dados para o servidor
 def send_data(data):
-    client.send(data.encode("utf-8"))
+    try:
+        client.send(data.encode("utf-8"))
+    except OSError as e:
+        print(f"Erro ao enviar dados: {e}")
 
 # Função para receber dados do servidor
 def receive_data():
@@ -28,7 +31,8 @@ def receive_data():
             data = client.recv(1024).decode("utf-8")
             if data:
                 handle_data(data)
-        except:
+        except OSError as e:
+            print(f"Erro ao receber dados: {e}")
             client.close()
             break
 
