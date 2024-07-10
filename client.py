@@ -1,6 +1,7 @@
 import pygame
 import socket
 import threading
+import json
 from settings import WIDTH, HEIGHT, WIN, FPS, WHITE, BLUE, BLACK, RED, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_LIFE, jump_sound, collect_star_sound, collect_coconut_sound, enemy_hit_sound, NUM_PLATFORMS, PLATFORM_HEIGHT
 from player import Player
 from game_platform import Platform
@@ -38,9 +39,15 @@ def receive_data():
 
 # Função para lidar com dados recebidos do servidor
 def handle_data(data):
-    global other_players
-    x, y = map(int, data.split(","))
-    other_players.append((x, y))
+    global other_players, enemies
+    if data.startswith("["):
+        enemies_data = json.loads(data)
+        enemies.clear()
+        for enemy_data in enemies_data:
+            enemies.append(Enemy(enemy_data['x'], enemy_data['y'], enemy_data['speed']))
+    else:
+        x, y = map(int, data.split(","))
+        other_players.append((x, y))
 
 # Inicializar thread para receber dados
 thread = threading.Thread(target=receive_data)
@@ -49,27 +56,27 @@ thread.start()
 # Variáveis de jogo
 level = 1
 other_players = []
+enemies = []
 
 def reset_game(level):
     platforms = create_platforms(NUM_PLATFORMS + level)
     ground = Platform(0, HEIGHT - PLATFORM_HEIGHT, WIDTH, PLATFORM_HEIGHT)
     platforms.add(ground)
     items = create_items(platforms, level)
-    enemies = create_enemies(level)
-    return platforms, items, enemies, 0
+    return platforms, items, 0
 
 def setup_game(level):
     player = Player(level)
-    platforms, items, enemies, score = reset_game(level)
+    platforms, items, score = reset_game(level)
     player.life = PLAYER_LIFE  # Reiniciar vida do jogador
-    return player, platforms, items, enemies, score
+    return player, platforms, items, score
 
 def main():
     global level
     clock = pygame.time.Clock()
     run = True
 
-    player, platforms, items, enemies, score = setup_game(level)
+    player, platforms, items, score = setup_game(level)
     player_name = input("Enter your name: ")  # Pedir o nome do jogador
 
     button_x, button_y, button_width, button_height = 650, 10, 140, 50
@@ -83,12 +90,13 @@ def main():
                 mouse_x, mouse_y = event.pos
                 if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
                     level = 1
-                    player, platforms, items, enemies, score = setup_game(level)
+                    player, platforms, items, score = setup_game(level)
 
         player.update(platforms)
         platforms.update()
         items.update()
-        enemies.update()
+        for enemy in enemies:
+            enemy.update()
 
         # Enviar posição do jogador para o servidor
         send_data(f"{player.rect.x},{player.rect.y}")
@@ -111,17 +119,18 @@ def main():
             WIN.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
             pygame.display.update()
             pygame.time.wait(2000)
-            player, platforms, items, enemies, score = setup_game(level)
+            player, platforms, items, score = setup_game(level)
 
         # Verificar se todos os itens foram coletados
         if not items:
             level += 1
-            player, platforms, items, enemies, _ = setup_game(level)
+            player, platforms, items, score = setup_game(level)
 
-        WIN.fill(WHITE)
+        WIN.fill(WHITE)  # Limpar a tela antes de desenhar
         platforms.draw(WIN)
         items.draw(WIN)
-        enemies.draw(WIN)
+        for enemy in enemies:
+            enemy.draw(WIN)
         player.draw(WIN)
 
         # Desenhar outros jogadores

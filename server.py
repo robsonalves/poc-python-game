@@ -1,52 +1,55 @@
 import socket
 import threading
+import time
+import json
 
 # Configurações do servidor
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 5555
 ADDR = (SERVER_IP, SERVER_PORT)
 
-# Lista de conexões ativas
-clients = []
+# Inicialização do servidor
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
+server.listen()
 
-# Função para lidar com novos clientes
-def handle_client(conn, addr):
-    print(f"[NOVA CONEXÃO] {addr} conectado.")
+clients = []
+enemies = []
+
+# Função para enviar dados para todos os clientes
+def broadcast(data):
+    for client in clients:
+        client.send(data.encode('utf-8'))
+
+# Função para lidar com clientes
+def handle_client(client):
     while True:
         try:
-            data = conn.recv(1024).decode("utf-8")
-            if not data:
-                break
-            print(f"[{addr}] {data}")
-            broadcast(data, conn)
+            data = client.recv(1024).decode('utf-8')
+            if data:
+                broadcast(data)
         except:
-            clients.remove(conn)
-            conn.close()
+            clients.remove(client)
+            client.close()
             break
 
-# Função para transmitir dados para todos os clientes conectados
-def broadcast(data, conn):
-    for client in clients:
-        if client != conn:
-            try:
-                client.send(data.encode("utf-8"))
-            except:
-                clients.remove(client)
-                client.close()
-
-# Função principal do servidor
-def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(ADDR)
-    server.listen()
-    print(f"[OUVINDO] Servidor está ouvindo em {SERVER_IP}:{SERVER_PORT}")
-
+# Função para aceitar conexões de clientes
+def accept_clients():
     while True:
-        conn, addr = server.accept()
-        clients.append(conn)
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
-        print(f"[CONEXÕES ATIVAS] {threading.active_count() - 1}")
+        client, addr = server.accept()
+        clients.append(client)
+        threading.Thread(target=handle_client, args=(client,)).start()
 
-print("[INICIANDO] Iniciando servidor...")
-start_server()
+# Função para atualizar o estado dos inimigos
+def update_enemies():
+    global enemies
+    while True:
+        # Atualizar a lógica dos inimigos aqui
+        # Por exemplo, movendo os inimigos ou mudando seu estado
+        enemy_data = json.dumps(enemies)
+        broadcast(enemy_data)
+        time.sleep(1)  # Enviar atualizações a cada segundo
+
+# Iniciar threads
+threading.Thread(target=accept_clients).start()
+threading.Thread(target=update_enemies).start()

@@ -33,4 +33,4 @@ https://freesound.org/
 [x] When the same name re-enter the game, just save the score if the last points is more high than other and not duplicate name on score
 [x] Bug: Not saving highscore when the last result is high the last one
 [x] Bug: When I start the game with two clients, for some reasone the second player is piiting all the screen in blue when it move the other player view
-[] Feature: In a multplayer enemeies behavior is necessary to be the same in both client
+[] Feature: In a multplayer enemies behavior is necessary to be the same in both client
