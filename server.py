@@ -14,7 +14,7 @@ server.bind(ADDR)
 server.listen()
 
 clients = []
-enemies = []
+enemies = [{'x': 100, 'y': 100, 'speed': 2}]  # Exemplo de estado inicial dos inimigos
 
 # Função para enviar dados para todos os clientes
 def broadcast(data):
@@ -45,7 +45,10 @@ def update_enemies():
     global enemies
     while True:
         # Atualizar a lógica dos inimigos aqui
-        # Por exemplo, movendo os inimigos ou mudando seu estado
+        for enemy in enemies:
+            enemy['x'] += enemy['speed']
+            if enemy['x'] > 600 or enemy['x'] < 0:  # Supondo que a largura da janela seja 600
+                enemy['speed'] = -enemy['speed']
         enemy_data = json.dumps(enemies)
         broadcast(enemy_data)
         time.sleep(1)  # Enviar atualizações a cada segundo

@@ -88,7 +88,7 @@ def main():
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
+                if button_x <= mouse_x <= button_x + button_width and mouse_y:
                     level = 1
                     player, platforms, items, score = setup_game(level)
 
